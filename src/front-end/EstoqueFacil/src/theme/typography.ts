@@ -1,26 +1,38 @@
-export const typography = {
-  fontFamily: {
-    regular: 'Poppins_400Regular',
-    medium: 'Poppins_500Medium',
-    semiBold: 'Poppins_600SemiBold',
-    bold: 'Poppins_700Bold',
-    extraBold: 'Poppins_800ExtraBold',
+import { TextStyle } from "react-native";
+
+export const typography: Record<string, TextStyle> = {
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
   },
 
-  fontSize: {
-    xs: 11,
-    sm: 13,
-    md: 15,
-    lg: 18,
-    xl: 22,
-    xxl: 28,
-    title: 38,
-    display: 48,
+  heading: {
+    fontSize: 20,
+    fontWeight: "600",
   },
 
-  lineHeight: {
-    tight: 1.1,
-    normal: 1.4,
-    relaxed: 1.6,
+  body: {
+    fontSize: 16,
+    fontWeight: "400",
   },
-} as const;
+
+  bodyMedium: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+
+  caption: {
+    fontSize: 14,
+    fontWeight: "400",
+  },
+
+  small: {
+    fontSize: 12,
+    fontWeight: "400",
+  },
+
+  button: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+};
