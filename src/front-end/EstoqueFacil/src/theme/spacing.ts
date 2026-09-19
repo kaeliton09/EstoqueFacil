@@ -8,6 +8,7 @@ export const spacing = {
   xxxl: 32,
   huge: 40,
   giant: 48,
+  screen: 24
 } as const;
 
 export const radius = {
