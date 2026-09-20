@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 import { useState } from "react";
+import { useRouter } from "expo-router";
 
 import { InputField } from "@/components/ui/InputField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
@@ -10,9 +11,14 @@ export function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const router = useRouter();
+
   function handleLogin() {
-    console.log("Email:", email);
-    console.log("Senha:", password);
+    if (!email || !password) {
+      return;
+    }
+
+    router.replace("/(tabs)");
   }
 
   return (
@@ -48,6 +54,7 @@ export function LoginScreen() {
         <PrimaryButton
           title="LOGIN"
           onPress={handleLogin}
+          disabled={!email || !password}
         />
 
       </View>

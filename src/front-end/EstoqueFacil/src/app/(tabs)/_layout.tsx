@@ -33,20 +33,6 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="search"
-        options={{
-          title: "Itens",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons
-              name="search-outline"
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
         name="add"
         options={{
           title: "Cadastrar",
@@ -61,18 +47,21 @@ export default function TabsLayout() {
       />
 
       <Tabs.Screen
-        name="menu"
+        name="search"
         options={{
-          title: "Menu",
+          title: "Itens",
           tabBarIcon: ({ color, size }) => (
             <Ionicons
-              name="menu-outline"
+              name="search-outline"
               size={size}
               color={color}
             />
           ),
         }}
       />
+
+      
+
     </Tabs>
   );
 }

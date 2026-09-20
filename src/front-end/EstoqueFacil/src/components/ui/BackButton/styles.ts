@@ -6,27 +6,21 @@ export const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-
-    backgroundColor: colors.black,
-
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 25
-    ,
-
+    minHeight: 48,
+    alignSelf: "flex-start",
+    paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
-    height: 48,
-
-    gap: spacing.xs,
-  },
-
-  buttonPressed: {
-    opacity: 0.7,
-    transform: [{ scale: 0.98 }],
+    backgroundColor: colors.black,
+    borderRadius: 20
+    ,
   },
 
   text: {
-    ...typography.caption,
+    ...typography.bodyMedium,
     color: colors.primary,
+  },
+
+  pressed: {
+    opacity: 0.6,
   },
 });

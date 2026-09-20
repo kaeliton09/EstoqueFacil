@@ -1,7 +1,7 @@
 import React from 'react';
 
-import AddScreen from '@/screens/ProductFormScreen';
+import AddProductScreen from '@/screens/ProductFormScreen';
 
 export default function Add() {
-  return <AddScreen />;
+  return <AddProductScreen />;
 }

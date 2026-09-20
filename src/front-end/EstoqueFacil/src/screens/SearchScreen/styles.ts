@@ -9,6 +9,12 @@ export const styles = StyleSheet.create({
         paddingTop: spacing.giant,
     },
 
+    titlePage: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.sm,
+    },
+
     content: {
         paddingHorizontal: spacing.screen,
         paddingTop: spacing.xl,
@@ -59,7 +65,7 @@ export const styles = StyleSheet.create({
 
     clearFilters: {
         ...typography.caption,
-        color: colors.secondary,
+        color: colors.primary,
 
         marginTop: spacing.sm,
     },

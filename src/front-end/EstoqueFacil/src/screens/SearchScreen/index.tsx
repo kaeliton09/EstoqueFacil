@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { ProductListItem } from "@/components/product/ProductListItem";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { FilterButton } from "@/components/ui/FilterButton";
+import { BackButton } from "@/components/ui/BackButton";
 
 import { styles } from "./styles";
 
@@ -15,10 +16,15 @@ export default function SearchScreen() {
             style={styles.container}
             contentContainerStyle={styles.content}
         >
+
             <View style={styles.header}>
-                <Text style={styles.title}>
+                <View style={styles.titlePage}>
+                    <BackButton />
+                    <Text style={styles.title}>
                     Buscar produto
                 </Text>
+                    
+                </View>
 
                 <Text style={styles.subtitle}>
                     Encontre um produto pelo nome ou código

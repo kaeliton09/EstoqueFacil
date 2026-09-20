@@ -14,7 +14,15 @@ export function FilterButton({
   onPress,
 }: FilterButtonProps) {
   return (
-    <Pressable style={styles.container} onPress={onPress}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Filtrar por ${title}`}
+      style={({ pressed }) => [
+        styles.container,
+        pressed && styles.buttonPressed,
+      ]}
+    >
       <Text style={styles.text}>
         {title}
       </Text>
@@ -22,7 +30,7 @@ export function FilterButton({
       <Ionicons
         name="chevron-down"
         size={16}
-        color={colors.text}
+        color={colors.primary}
       />
     </Pressable>
   );

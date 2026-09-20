@@ -9,24 +9,24 @@ import {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.black,
     borderRadius: 16,
     padding: spacing.lg,
   },
 
   label: {
     ...typography.body,
-    color: colors.black,
+    color: colors.primary,
   },
 
   value: {
     ...typography.title,
-    color: colors.black,
+    color: colors.primary,
     marginTop: spacing.sm,
   },
   title: {
   ...typography.body,
-  color: colors.black,
+  color: colors.primary,
   flexShrink: 1,
 },
 });

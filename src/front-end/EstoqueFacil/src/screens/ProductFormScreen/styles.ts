@@ -6,9 +6,14 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: spacing.screen,
-    paddingBottom: spacing.screen,
+    paddingTop: spacing.giant,
   },
+
+    titlePage: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.sm,
+    },
 
   content: {
     paddingHorizontal: spacing.screen,
