@@ -11,6 +11,8 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { styles } from "./styles";
 import { BackButton } from "@/components/ui/BackButton";
 
+import { mockProducts } from "@/mocks/products";
+
 export default function AddProductScreen() {
   const [name, setName] = useState("");
   const [code, setCode] = useState("");

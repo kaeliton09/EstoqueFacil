@@ -6,10 +6,24 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { FilterButton } from "@/components/ui/FilterButton";
 import { BackButton } from "@/components/ui/BackButton";
 
+import { mockProducts } from "@/mocks/products";
+
 import { styles } from "./styles";
 
 export default function SearchScreen() {
     const [search, setSearch] = useState("");
+    const [category, setCategory] = useState<string | null>(null);
+
+    const filteredProducts = mockProducts.filter((product) => {
+        const matchesSearch = product.name
+            .toLowerCase()
+            .includes(search.toLowerCase());
+
+        const matchesCategory =
+            !category || product.category === category;
+
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <ScrollView
@@ -21,9 +35,9 @@ export default function SearchScreen() {
                 <View style={styles.titlePage}>
                     <BackButton />
                     <Text style={styles.title}>
-                    Buscar produto
-                </Text>
-                    
+                        Buscar produto
+                    </Text>
+
                 </View>
 
                 <Text style={styles.subtitle}>
@@ -57,29 +71,14 @@ export default function SearchScreen() {
                     Produtos
                 </Text>
 
-                <ProductListItem
-                    name="Teclado Mecânico"
-                    code="PRD-001"
-                    quantity={15}
-                />
-
-                <ProductListItem
-                    name="Mouse sem fio"
-                    code="PRD-002"
-                    quantity={8}
-                />
-
-                <ProductListItem
-                    name="Monitor 24 polegadas"
-                    code="PRD-003"
-                    quantity={3}
-                />
-
-                <ProductListItem
-                    name="Cabo HDMI"
-                    code="PRD-004"
-                    quantity={25}
-                />
+                {filteredProducts.map((product) => (
+                    <ProductListItem
+                        key={product.id}
+                        name={product.name}
+                        code={product.code}
+                        quantity={product.quantity}
+                    />
+                ))}
             </View>
         </ScrollView>
     );

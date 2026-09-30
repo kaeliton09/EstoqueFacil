@@ -6,6 +6,8 @@ import { StatisticCard } from "@/components/dashboard/StatisticCard";
 import { styles } from "./styles";
 import { ProductListItem } from "@/components/product/ProductListItem";
 
+import { mockProducts } from "@/mocks/products";
+
 export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
@@ -41,46 +43,14 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.itemsList}>
-          <ProductListItem
-            name="Produto 1"
-            code="123456"
-            quantity={10}
-          />
-           <ProductListItem
-            name="Produto 2"
-            code="123457"
-            quantity={9}
-          />
-          <ProductListItem
-            name="Produto 1"
-            code="123456"
-            quantity={10}
-          />
-           <ProductListItem
-            name="Produto 2"
-            code="123457"
-            quantity={9}
-          />
-          <ProductListItem
-            name="Produto 1"
-            code="123456"
-            quantity={10}
-          />
-           <ProductListItem
-            name="Produto 2"
-            code="123457"
-            quantity={9}
-          />
-          <ProductListItem
-            name="Produto 1"
-            code="123456"
-            quantity={10}
-          />
-           <ProductListItem
-            name="Produto 2"
-            code="123457"
-            quantity={9}
-          />
+          {mockProducts.map((product) => (
+            <ProductListItem
+              key={product.id}
+              name={product.name}
+              code={product.code}
+              quantity={product.quantity}
+            />
+          ))}
         </View>
 
       </View>
