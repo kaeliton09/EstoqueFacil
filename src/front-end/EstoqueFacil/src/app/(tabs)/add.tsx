@@ -8,7 +8,7 @@ import { colors, radius, spacing, typography } from '../../theme';
 import { notify } from '../../utils/dialog';
 import { FormErrors, validateProduct } from '../../utils/validators';
 
-const EMPTY = { name: '', code: '', quantity: '', minQuantity: '5', price: '', street: '', column: '', bay: '', level: '' };
+const EMPTY = { name: '', code: '', quantity: '', minimumQuantity: '', price: '', street: '', column: '', bay: '', level: '' };
 
 export default function AddProductScreen() {
   const { products, categories, addProduct, addCategory } = useProducts();
@@ -34,7 +34,7 @@ export default function AddProductScreen() {
       code: form.code.trim(),
       category,
       quantity: Number(form.quantity),
-      minQuantity: Number(form.minQuantity) || 0,
+      minimumQuantity: Number(form.minimumQuantity) || 0,
       price: Number(form.price.replace(',', '.')),
       location: { street: form.street.trim(), column: form.column.trim(), bay: form.bay.trim(), level: form.level.trim() },
     });
@@ -93,7 +93,7 @@ export default function AddProductScreen() {
                 <InputField label="Quantidade" placeholder="0" keyboardType="number-pad" value={form.quantity} onChangeText={set('quantity')} error={errors.quantity} />
               </View>
               <View style={{ flex: 1 }}>
-                <InputField label="Estoque mínimo" placeholder="5" keyboardType="number-pad" value={form.minQuantity} onChangeText={set('minQuantity')} />
+                <InputField label="Estoque mínimo" placeholder="5" keyboardType="number-pad" value={form.minimumQuantity} onChangeText={set('minimumQuantity')} />
               </View>
             </View>
             <InputField label="Preço (R$)" placeholder="0,00" keyboardType="decimal-pad" value={form.price} onChangeText={set('price')} error={errors.price} />

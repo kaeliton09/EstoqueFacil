@@ -18,8 +18,8 @@ export type Product = {
 
 export type StockStatus = 'ok' | 'low' | 'out';
 
-export function getStockStatus(p: Pick<Product, 'quantity' | 'minQuantity'>): StockStatus {
+export function getStockStatus(p: Pick<Product, 'quantity' | 'minimumQuantity'>): StockStatus {
   if (p.quantity <= 0) return 'out';
-  if (p.quantity <= p.minQuantity) return 'low';
+  if (p.quantity <= p.minimumQuantity) return 'low';
   return 'ok';
 }
