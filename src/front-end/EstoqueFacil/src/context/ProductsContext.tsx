@@ -17,7 +17,7 @@ const num = (v: unknown): number => {
 const toProduct = (p: ApiProduct): Product =>
   ({
     id: String(p.id),
-    code: p.code,
+    code: String(p.code ?? ""),
     name: p.name,
     quantity: p.quantity,
     minimumQuantity: p.minimumQuantity,
@@ -34,7 +34,7 @@ const toProduct = (p: ApiProduct): Product =>
 
 /** app -> backend */
 const toPayload = (p: any, categoryId: number): CreateProductDTO => ({
-  code: num(p.code),
+  code: String(p.code ?? "").trim(),
   name: p.name ?? "",
   quantity: num(p.quantity),
   minimumQuantity: num(p.minimumQuantity),

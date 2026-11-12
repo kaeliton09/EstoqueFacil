@@ -10,7 +10,7 @@ export type ApiAddress = {
 
 export type ApiProduct = {
   id: number;
-  code: number;
+  code: string;
   name: string;
   quantity: number;
   minimumQuantity: number;
@@ -20,7 +20,7 @@ export type ApiProduct = {
 };
 
 export type CreateProductDTO = {
-  code: number;
+  code: string;
   name: string;
   quantity: number;
   minimumQuantity: number;
