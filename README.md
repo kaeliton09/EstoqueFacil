@@ -1,436 +1,281 @@
 # Estoque Fácil
 
-Aplicativo mobile para gerenciamento de estoque de pequenos e médios comerciantes, com cadastro de produtos e categorias, consulta de quantidades, localização física dos itens e controle de movimentações de estoque. A aplicação utiliza uma API REST desenvolvida em Java com Spring Boot e persiste os dados em um banco de dados PostgreSQL.
-
 ## Descrição
-
-O Estoque Fácil tem como objetivo simplificar o controle de mercadorias, permitindo que o comerciante consulte informações sobre seus produtos, acompanhe o nível de estoque e identifique a localização física dos itens por meio de rua, coluna, vão e nível.
-
-O projeto foi desenvolvido em etapas, começando pelo planejamento e protótipo da interface mobile até chegar à primeira versão funcional integrada a um backend próprio.
+Aplicativo mobile para gerenciamento inteligente de estoque voltado a
+pequenos e médios comerciantes, permitindo cadastrar, buscar e localizar
+produtos fisicamente no estoque (rua, coluna, vão e nível). O aplicativo se
+comunica com um backend próprio (API REST), que guarda os dados em um banco
+relacional.
 
 ## Problema que a aplicação resolve
-
-Pequenos e médios comércios muitas vezes não possuem ferramentas adequadas para controlar as quantidades e a localização dos produtos armazenados. Isso pode gerar perda de tempo na busca por mercadorias, dificuldade para identificar itens que precisam de reposição e falta de visibilidade sobre o valor do estoque.
-
-O Estoque Fácil busca centralizar essas informações em uma aplicação mobile de interface simples, com persistência em banco de dados e comunicação com uma API REST.
+Pequenos e médios comércios muitas vezes não têm controle preciso sobre a
+quantidade e a localização dos produtos em estoque, o que gera perda de
+tempo na busca de itens e falta de visibilidade para o lojista.
 
 ## Tecnologias utilizadas
+- **Mobile:** React Native (Expo) + TypeScript
+- **Navegação:** Expo Router (rotas baseadas em arquivos, `Stack` + `Tabs` inferiores)
+- **Tipografia:** Poppins
+- **Backend:** Java + Spring Boot (Spring Web, Spring Data JPA, Bean Validation, Lombok)
+- **Banco de dados:** PostgreSQL (relacional), acessado via JPA/Hibernate
+- **Comunicação app ↔ backend:** API REST em JSON, via `fetch`
+- **Serviço externo (Etapa 6):** Open Products Facts e Open Food Facts, para consultar produtos pelo código de barras (sem chave de acesso)
+- **Persistência local (prevista):** SQLite / AsyncStorage — na Etapa 5 os dados passaram a ser guardados no servidor, que é a fonte única da verdade
 
-| Camada | Tecnologias |
-|---|---|
-| Aplicativo mobile | React Native, Expo e TypeScript |
-| Navegação | Expo Router (`Stack` e `Tabs`) |
-| Interface | Poppins e componentes reutilizáveis |
-| Backend | Java e Spring Boot |
-| API | Spring Web |
-| Persistência | Spring Data JPA e Hibernate |
-| Banco de dados | PostgreSQL |
-| Validação | Jakarta Bean Validation |
-| Produtividade | Lombok |
-| Comunicação | API REST, JSON e `fetch` |
-
-**Uso de inteligência artificial:** o assistente Claude, da Anthropic, foi utilizado como apoio na integração entre o aplicativo e a API, na depuração e na elaboração da documentação. O código foi revisado e testado pelo autor.
+**Uso de IA:** o assistente Claude (Anthropic) foi usado como apoio na
+integração entre app e API, na depuração e na redação da documentação. O
+código foi revisado e testado pelo autor.
 
 ## Estrutura do repositório
 
 ```text
 EstoqueFacil/
 ├── README.md
-├── docs/
-│   ├── proposta.md
-│   ├── etapa-02.md
-│   ├── etapa-03.md
-│   ├── etapa-05.md
-│   └── screenshots/
+├── docs/                          # proposta e documentação de cada etapa
 └── src/
-    ├── back-end/
-    │   └── EstoqueFacil/
-    │       └── src/main/java/dev/Kaeliton/EstoqueFacil/
-    │           ├── Address/
-    │           ├── Category/
-    │           └── Products/
-    └── front-end/
-        └── EstoqueFacil/
-            └── src/
-                ├── app/
-                ├── components/
-                ├── context/
-                ├── services/
-                └── types/
+    ├── back-end/EstoqueFacil/     # API Spring Boot
+    │   └── src/main/java/dev/Kaeliton/EstoqueFacil/
+    │       ├── Address/           # endereço físico (embeddable)
+    │       ├── Category/          # model, repository, service e controller
+    │       └── Products/          # model, repository, service e controller
+    └── front-end/EstoqueFacil/    # aplicativo React Native (Expo)
+        └── src/
+            ├── app/               # telas e rotas
+            ├── components/        # componentes reutilizáveis
+            ├── context/           # ProductsContext (estado global)
+            ├── hooks/             # useBarcodeLookup (consulta ao serviço externo)
+            ├── services/          # comunicação com a API
+            └── types/
 ```
-
-### Responsabilidades dos diretórios
-
-- `Address/`: representação do endereço físico dos produtos.
-- `Category/`: implementação das operações relacionadas às categorias, incluindo model, repository, service e controller.
-- `Products/`: implementação das operações relacionadas aos produtos, incluindo model, repository, service e controller.
-- `app/`: telas e rotas do aplicativo mobile.
-- `components/`: componentes reutilizáveis da interface.
-- `context/`: gerenciamento do estado global dos produtos.
-- `services/`: comunicação HTTP com a API.
-- `types/`: definições de tipos utilizadas no frontend.
 
 ## Navegação
 
-A navegação é implementada com Expo Router. O `Stack` principal organiza as telas de acesso e os detalhes dos produtos, enquanto as abas inferiores permitem navegar pelas principais funcionalidades do aplicativo.
+A navegação é feita com o Expo Router. O `Stack` principal direciona o
+usuário para a tela de Login e, após o acesso, para o grupo de abas inferiores.
 
 ```text
 src/app/
-├── _layout.tsx
-├── index.tsx
+├── _layout.tsx        # Stack principal
+├── index.tsx          # Redireciona para o Login
 ├── login.tsx
-├── produto/
-│   └── [id].tsx
+├── produto/[id].tsx   # Detalhe do produto (ajuste de quantidade e exclusão)
 └── (tabs)/
-    ├── _layout.tsx
-    ├── index.tsx
-    ├── search.tsx
-    └── add.tsx
+    ├── _layout.tsx    # Barra de navegação inferior (Tabs)
+    ├── index.tsx      # Home / Dashboard
+    ├── search.tsx     # Itens / Busca
+    └── add.tsx        # Cadastrar produto
 ```
-
-Fluxo principal:
 
 ```text
-Aplicação
-    └── Login (demonstrativo)
-         └── Área principal
-              ├── Home
-              ├── Itens
-              │    └── Detalhe do produto
-              └── Cadastrar
+Aplicação → Login → Área principal ┬─ Home
+                                   ├─ Itens ── Detalhe do produto
+                                   └─ Cadastrar
 ```
 
-| Aba | Função |
-|---|---|
-| Home | Exibir o resumo do estoque, o valor total e os produtos que precisam de reposição. |
-| Itens | Consultar, pesquisar e filtrar produtos cadastrados. |
-| Cadastrar | Cadastrar produtos e informar seus dados, categoria e localização. |
-| Detalhe do produto | Consultar informações, registrar entradas e baixas e excluir produtos. |
+| Aba       | Função                         |
+| --------- | ------------------------------ |
+| Home      | Visualizar o resumo do estoque |
+| Itens     | Buscar e consultar produtos    |
+| Cadastrar | Cadastrar um novo produto      |
 
-A aba **Menu** foi removida na Etapa 03 por não possuir funcionalidades suficientes para justificar uma área própria. Ela poderá ser reintroduzida futuramente, caso sejam implementadas configurações ou opções administrativas.
+> Na Etapa 03, a aba **Menu** foi removida por não possuir funcionalidades
+> suficientes que justificassem uma área própria. Ela poderá ser
+> reintroduzida caso sejam implementadas configurações, perfil ou outras
+> opções administrativas.
 
-## Arquitetura da integração — Etapa 05
-
-A Etapa 05 implementa a integração entre o aplicativo mobile, a API REST e o banco de dados relacional.
+## Arquitetura da integração (Etapa 5)
 
 ```text
-┌─────────────────────────┐
-│    Telas do aplicativo  │
-│       React Native      │
-└────────────┬────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│    ProductsContext      │
-│   Estado global         │
-└────────────┬────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│       services/         │
-│  API e serviços HTTP    │
-└────────────┬────────────┘
-             │ JSON / HTTP
-             ▼
-┌─────────────────────────┐
-│     API Spring Boot     │
-│ Controllers / Services  │
-│ Repositories / JPA      │
-└────────────┬────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│       PostgreSQL        │
-└─────────────────────────┘
+Telas  →  ProductsContext  →  services/ (api, productService, categoryService)  →  API Spring Boot  →  PostgreSQL
 ```
 
-### Responsabilidades das camadas
+- **Telas** só usam o hook `useProducts()`; não conhecem URLs nem `fetch`.
+- **`ProductsContext`** mantém o estado global e converte os dados entre o formato do app e o da API (`toProduct` / `toPayload`).
+- **`services/`** concentra todas as chamadas HTTP.
+- **Backend** valida os dados (Bean Validation) e persiste com JPA.
 
-- **Telas:** apresentam os dados e permitem que o usuário execute as operações do sistema.
-- **`ProductsContext`:** mantém o estado global dos produtos e centraliza a interação do frontend com os serviços.
-- **`services/`:** concentra as requisições HTTP, evitando que as telas precisem conhecer diretamente as URLs da API.
-- **Backend:** recebe as requisições, valida os dados, executa as regras de negócio e coordena a persistência.
-- **JPA/Hibernate:** realiza o mapeamento entre as entidades Java e as tabelas do banco de dados.
-- **PostgreSQL:** armazena os dados persistentes de produtos e categorias.
+### Endpoints da API
 
-O estado exibido pelo aplicativo é atualizado a partir das respostas da API. Nesta etapa, o servidor é a fonte principal dos dados, sem implementação de persistência offline ou cache local.
+| Recurso | Método e rota |
+| --- | --- |
+| Categorias | `GET /category/list`, `GET /category/list/names`, `POST /category/create`, `DELETE /category/delete/{id}` |
+| Produtos | `GET /products/list`, `GET /products/list/last-ten`, `GET /products/{id}`, `POST /products/create`, `POST /products/update/{id}`, `DELETE /products/delete/{id}` |
+| Buscas | `GET /products/category/{categoryId}`, `GET /products/name/{name}`, `GET /products/barcode/{barcode}` |
 
-## Endpoints da API
+### Serviço externo (Etapa 6)
 
-Os endpoints implementados para a integração estão organizados por recurso.
+Na tela **Cadastrar**, o usuário informa o código de barras e toca em **Buscar dados do produto**. O app consulta o Open Products Facts (e, se não encontrar, o Open Food Facts) e preenche o nome do produto.
 
-### Categorias
+```text
+add.tsx → useBarcodeLookup → openProductsFactsService → GET world.openproductsfacts.org/api/v2/product/{codigo}.json
+                                                      └→ (se não achar) GET world.openfoodfacts.org/api/v2/product/{codigo}.json
+```
 
-| Método | Endpoint | Operação |
-|---|---|---|
-| GET | `/category/list` | Listar categorias |
-| GET | `/category/list/names` | Consultar nomes das categorias |
-| POST | `/category/create` | Criar categoria |
-| DELETE | `/category/delete/{id}` | Excluir categoria |
+A consulta é feita direto do aplicativo, pois a leitura não exige chave nem token. Detalhes (endpoints, formato dos dados, estados e testes) em [`docs/etapa-06.md`](docs/etapa-06.md).
 
-### Produtos
-
-| Método | Endpoint | Operação |
-|---|---|---|
-| GET | `/products/list` | Listar produtos |
-| GET | `/products/list/last-ten` | Consultar os dez produtos mais recentes |
-| GET | `/products/{id}` | Consultar produto por ID |
-| POST | `/products/create` | Cadastrar produto |
-| POST | `/products/update/{id}` | Atualizar produto |
-| DELETE | `/products/delete/{id}` | Excluir produto |
-
-### Consultas específicas
-
-| Método | Endpoint | Operação |
-|---|---|---|
-| GET | `/products/category/{categoryId}` | Consultar produtos por categoria |
-| GET | `/products/name/{name}` | Buscar produto pelo nome |
-| GET | `/products/barcode/{barcode}` | Consultar produto pelo código de barras |
-
-**Observação:** o endpoint de consulta por código de barras está previsto na API, mas a leitura automática pela câmera do celular ainda não está implementada.
-
-## Funcionalidades implementadas
-
-- [x] Interface de login e cadastro de acesso demonstrativa.
-- [x] Dashboard com resumo do estoque, valor total, categorias e produtos.
-- [x] Cadastro de produtos com informações comerciais e localização física.
-- [x] Cadastro e consulta de categorias.
-- [x] Listagem, pesquisa e filtragem de produtos.
-- [x] Consulta detalhada de produtos.
-- [x] Registro de entrada e baixa de estoque.
-- [x] Validação para impedir quantidades negativas nas movimentações.
-- [x] Exclusão de produtos.
-- [x] Persistência de produtos e categorias via API e PostgreSQL.
-- [x] Integração entre frontend e backend.
-- [x] Validação de dados no backend com Jakarta Bean Validation.
-- [x] Feedback visual e indicador de carregamento nas operações aplicáveis.
-- [x] Medidas iniciais de acessibilidade para leitores de tela.
-- [ ] Autenticação real e controle de acesso por usuário.
-- [ ] Leitura de código de barras utilizando a câmera.
-- [ ] Funcionamento offline e sincronização posterior.
-- [ ] Testes automatizados.
+> O campo `code` do produto passou a ser **texto** (`String`), porque códigos de barras EAN-13 não cabem em `int` e podem começar com zero. Em um banco já existente, converta a coluna (veja a seção abaixo).
 
 ## UX e acessibilidade
 
-### Feedback visual
+**Feedback visual**
+- Botões: estados normal, pressionado, desabilitado e carregamento (quando aplicável)
+- Campos de entrada: estados normal, focado, erro (com mensagem textual) e desabilitado
+- Filtros: estados normal, pressionado e selecionado
+- Indicador de carregamento enquanto os dados são buscados no servidor
 
-A interface contempla estados visuais para orientar o usuário durante a utilização:
+**Componentes reutilizáveis:** `PrimaryButton`, `InputField`, `FilterButton`,
+`SearchInput`, `BackButton` e `ProductListItem`, garantindo comportamento e
+aparência consistentes entre as telas.
 
-- Botões nos estados normal, pressionado, desabilitado e carregamento, quando aplicável.
-- Campos de entrada com estados de foco, erro e desabilitado.
-- Filtros com indicação de seleção.
-- Mensagens textuais para comunicar erros de entrada.
-- Indicadores de carregamento durante as consultas ao servidor.
-
-### Componentes reutilizáveis
-
-Entre os componentes utilizados estão:
-
-- `PrimaryButton`
-- `InputField`
-- `FilterButton`
-- `SearchInput`
-- `BackButton`
-- `ProductListItem`
-
-A reutilização desses componentes ajuda a manter a consistência visual e comportamental entre as telas.
-
-### Acessibilidade
-
-- Uso de `accessibilityRole`, `accessibilityLabel` e `accessibilityState` nos elementos interativos aplicáveis.
-- Identificação textual dos campos e de seus erros.
-- Descrição específica do botão de voltar para leitores de tela.
-- Informações importantes apresentadas sem depender exclusivamente de cores.
-- Tipografia e espaçamentos centralizados no sistema de tema.
-- Áreas de toque dimensionadas para interação em dispositivos móveis.
+**Acessibilidade**
+- `accessibilityRole`, `accessibilityLabel` e `accessibilityState` nos botões, campos e filtros
+- Campos com label, indicação de estado desabilitado e identificação de erro
+- `BackButton` com identificação específica para leitores de tela
+- Informações importantes não dependem apenas de cor (uso de mensagens textuais)
+- Tipografia e espaçamentos centralizados no sistema de tema da aplicação
+- Áreas de toque dimensionadas para uso em dispositivos móveis
 
 ## Capturas de tela
 
-As capturas podem ser armazenadas no diretório `docs/screenshots/`.
-
-| Login | Cadastro de produto |
+| Login | Cadastro de Produto |
 |---|---|
-| ![Tela de login](docs/screenshots/index.jpeg) | ![Tela de cadastro de produto](docs/screenshots/list.jpeg) |
+| ![Tela de login](docs/screenshots/login.jpeg) | ![Tela de cadastro de produto](docs/screenshots/cadastro-produtos.jpeg) |
 
-Caso as imagens ainda não estejam no repositório, adicione os arquivos com os nomes acima ou ajuste os caminhos para corresponder aos arquivos existentes.
+> Salve as imagens em `docs/screenshots/` com esses nomes (ou ajuste os caminhos acima) para as imagens aparecerem no README.
 
 ## Instruções para execução
 
-Para testar o fluxo completo, é necessário executar o backend, configurar o PostgreSQL e iniciar o aplicativo mobile.
+Para o fluxo completo é preciso rodar o **backend** e o **aplicativo**.
 
 ### Pré-requisitos
+- JDK compatível com o `pom.xml` (Maven ou o `mvnw` do projeto)
+- PostgreSQL em execução com um banco criado para o projeto
+- Node.js e npm
+- Expo Go no celular, ou um emulador Android
 
-- JDK compatível com o projeto.
-- Maven ou Maven Wrapper (`mvnw`).
-- PostgreSQL instalado e em execução.
-- Node.js e npm.
-- Expo Go em um dispositivo compatível ou emulador Android.
-- Acesso à rede entre o dispositivo e o computador, quando utilizado um celular físico.
-
-### 1. Configurar o banco de dados
-
-Crie um banco de dados PostgreSQL para o projeto e configure as credenciais utilizadas pelo backend.
-
-Consulte o arquivo de configuração da aplicação em `src/back-end/EstoqueFacil` e preencha as variáveis de ambiente previstas no projeto.
-
-Se houver um arquivo `.env.example`, utilize-o como referência para criar o arquivo `.env` correspondente.
-
-Não compartilhe credenciais reais nem envie arquivos `.env` com senhas para o repositório.
-
-### 2. Executar o backend
-
-No terminal, a partir da raiz do repositório:
+### 1. Backend
 
 ```bash
 cd src/back-end/EstoqueFacil
+# copie o .env.example para .env e preencha as credenciais do banco
 ./mvnw spring-boot:run
 ```
 
-No Windows, caso necessário, utilize:
+A API sobe em `http://localhost:8080`. As tabelas `category` e `product` são
+criadas automaticamente pelo Hibernate na primeira execução.
 
-```powershell
-.\mvnw.cmd spring-boot:run
-```
-
-A API deverá estar disponível em:
-
-```text
-http://localhost:8080
-```
-
-Na configuração descrita para esta etapa, o Hibernate cria as tabelas das entidades durante a inicialização, conforme as propriedades definidas no projeto.
-
-Confirme que a conexão com o PostgreSQL foi estabelecida antes de iniciar os testes pelo aplicativo.
-
-### 3. Configurar e executar o aplicativo
-
-Em outro terminal:
+### 2. Aplicativo
 
 ```bash
 cd src/front-end/EstoqueFacil
 npm install
-```
-
-Configure a variável `EXPO_PUBLIC_API_URL` no arquivo `.env` do frontend, de acordo com o ambiente de execução.
-
-Exemplo para um emulador Android:
-
-```env
-EXPO_PUBLIC_API_URL=http://10.0.2.2:8080
-```
-
-Valores para outros ambientes:
-
-| Ambiente | Valor de `EXPO_PUBLIC_API_URL` |
-|---|---|
-| Emulador Android | `http://10.0.2.2:8080` |
-| Simulador iOS | `http://localhost:8080` |
-| Celular físico com Expo Go | `http://IP_DO_PC:8080` |
-
-No celular físico, substitua `IP_DO_PC` pelo endereço IPv4 do computador na rede local. O celular e o computador devem estar na mesma rede, e o firewall precisa permitir a conexão com a porta da API.
-
-O endereço `localhost` no celular aponta para o próprio celular, não para o computador que está executando o backend.
-
-Depois da configuração, inicie o Expo:
-
-```bash
+# copie o .env.example para .env e ajuste EXPO_PUBLIC_API_URL
 npx expo start
 ```
 
-Para reiniciar o servidor do Expo limpando o cache:
+`EXPO_PUBLIC_API_URL` depende de onde o app roda:
+
+| Onde roda | Valor |
+| --- | --- |
+| Emulador Android | `http://10.0.2.2:8080` |
+| Simulador iOS | `http://localhost:8080` |
+| Celular físico (Expo Go) | `http://IP_DO_PC:8080` (mesma rede Wi-Fi) |
+
+Com o Expo em execução, é possível abrir a aplicação:
+- no **Expo Go**, escaneando o QR code em um dispositivo Android;
+- em um **emulador Android**, pressionando `a` no terminal;
+- no **navegador**, pressionando `w` no terminal (quando suportado).
+
+Depois de alterar o `.env` ou em caso de problemas após alterações nos
+arquivos, reinicie limpando o cache:
 
 ```bash
 npx expo start -c
 ```
 
-Após alterar o `.env`, reinicie o Expo para que as variáveis sejam carregadas novamente.
+> No Windows, se o PowerShell bloquear o `npm`, rode uma vez
+> `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
+> ou use o Prompt de Comando (cmd).
 
-Com o Expo em execução, você poderá:
+### Testando o fluxo completo (Etapa 5)
 
-- Abrir o aplicativo no Expo Go, escaneando o QR code.
-- Pressionar `a` no terminal para abrir o emulador Android.
-- Pressionar `w` para executar a versão web, quando suportada pelas dependências utilizadas.
+1. Suba o backend e o aplicativo.
+2. Inicie a aplicação, passe pelo Login (fluxo de demonstração) e acesse a Home.
+3. Cadastre uma categoria e, na aba **Cadastrar**, um produto com quantidade, quantidade mínima, preço e localização.
+4. Confira o produto na aba **Itens** e na Home (valor total e itens que precisam de reposição).
+5. Abra o produto e registre uma entrada ou baixa de estoque.
+6. Exclua o produto e confirme que ele sumiu da lista.
+7. Teste entradas inválidas (campos vazios, valores negativos) e confira as mensagens de erro.
 
-**Importante:** as variáveis `EXPO_PUBLIC_*` são incorporadas ao aplicativo e não devem conter senhas, tokens privados ou outras credenciais.
+O roteiro detalhado, com exemplos para testar a API no Postman, está em
+[`docs/etapa-05.md`](docs/etapa-05.md).
 
-## Testando o fluxo completo de negócio — Etapa 05
+### Testando a integração com o serviço externo (Etapa 6)
 
-O fluxo principal implementado atende à proposta de executar uma operação de negócio do início ao fim: criar, visualizar, alterar e excluir um produto.
+Requer internet no aparelho ou emulador.
 
-1. Inicie o PostgreSQL e confirme que o banco está acessível.
-2. Execute o backend Spring Boot.
-3. Inicie o aplicativo Expo e acesse a tela de login.
-4. Utilize o fluxo de acesso demonstrativo para entrar na área principal.
-5. Cadastre uma categoria, caso ainda não exista.
-6. Acesse a aba **Cadastrar** e registre um produto com nome, categoria, quantidade, quantidade mínima, preço e localização física.
-7. Acesse a aba **Itens** e confirme que o produto aparece na listagem.
-8. Abra o detalhe do produto e confira as informações cadastradas.
-9. Registre uma entrada ou baixa de estoque e verifique a quantidade atualizada.
-10. Retorne à listagem e à Home para conferir os dados atualizados.
-11. Exclua o produto e confirme que ele deixou de aparecer na listagem.
-12. Teste entradas inválidas, como campos obrigatórios vazios e valores negativos, e verifique o tratamento de erros.
+1. Abra a aba **Cadastrar**, digite `737628064502` no código de barras e toque em **Buscar dados do produto**. O nome deve ser preenchido.
+2. Confira o produto, escolha a categoria, preencha o restante e cadastre.
+3. Estados: um código inventado (ex.: `1234567890123`) mostra "não encontrado"; com o modo avião ligado aparece o erro de conexão; um código com menos de 8 dígitos mostra o erro de validação; durante a consulta o botão exibe o carregamento.
+4. Cadastrar o mesmo código duas vezes é recusado.
 
-Para testar a API de forma independente do aplicativo, utilize uma ferramenta como o Postman e envie requisições aos endpoints documentados anteriormente.
+**Banco já existente:** como `code` virou texto, rode uma vez (PostgreSQL) `ALTER TABLE product ALTER COLUMN code TYPE varchar(20) USING code::varchar;` ou apague a tabela `product` em desenvolvimento. Em um banco novo o Hibernate já cria a coluna correta.
 
-O roteiro complementar, incluindo instruções de execução, testes da API e decisões técnicas, está disponível em [`docs/etapa-05.md`](docs/etapa-05.md).
+### Testando a navegação e a acessibilidade
 
-### Testando a acessibilidade
+1. Inicie a aplicação e verifique o direcionamento para a tela de Login.
+2. Preencha e-mail e senha e pressione o botão de Login (fluxo de demonstração).
+3. Confirme o acesso à Home e navegue pelas abas **Itens** e **Cadastrar**.
+4. Na aba Itens, utilize o campo de busca e os filtros.
+5. Na aba Cadastrar, teste os campos de entrada e seus estados visuais.
+6. Ative o leitor de tela do dispositivo (no Android, o **TalkBack**) e verifique
+   se os elementos interativos possuem identificação e descrição adequadas.
 
-1. Navegue pelas telas e verifique a identificação dos elementos interativos.
-2. Teste os estados de foco, erro, desabilitado e carregamento, quando aplicáveis.
-3. Ative o TalkBack no Android e confira os rótulos e as descrições dos botões, campos e filtros.
-4. Verifique se as mensagens de erro e os estados importantes podem ser compreendidos sem depender apenas de cores.
+## Funcionalidades implementadas
+
+- [x] Login — interface implementada (e-mail, senha, "esqueceu a senha?", cadastro); **sem autenticação real ainda**
+- [x] Dashboard (Home) — visão geral do estoque (itens cadastrados, itens com estoque baixo, valor total, gráfico por categoria e seção de produtos), agora com **dados reais vindos da API**
+- [x] Cadastro de produto — informações do produto, localização e categoria, **salvos no banco via API**
+- [x] Cadastro de categorias — criação e listagem de categorias via API
+- [x] Listagem/busca de produtos — campo de busca, filtros e lista com código e quantidade em estoque, com dados reais
+- [x] Alteração de estoque — entrada e baixa de quantidade, sem permitir valor negativo
+- [x] Exclusão de produtos
+- [x] Endereçamento físico do produto (rua, coluna, vão, nível) — salvo e exibido nas telas
+- [x] **Fluxo completo de negócio (Etapa 5):** criar → visualizar → alterar → excluir produto
+- [x] **Integração com serviço externo (Etapa 6):** consulta de produto por código de barras (Open Products Facts / Open Food Facts), com estados de carregamento, sucesso, erro e ausência de dados
+- [x] Código de barras salvo como texto, com bloqueio de código duplicado no backend
+- [x] Backend REST com Spring Boot, JPA e PostgreSQL
+- [x] Validação de dados no backend (`@NotBlank`, `@NotNull`, `@PositiveOrZero`) e tratamento de entradas inválidas no app
+- [x] Navegação por abas (Home, Itens, Cadastrar) com fluxo Login → área principal
+- [x] Feedback visual nos principais componentes (botões, campos de entrada, filtros e indicador de carregamento)
+- [x] Medidas iniciais de acessibilidade (papéis, rótulos e estados para leitores de tela)
+- [ ] Autenticação real (login com backend)
+- [ ] Leitura de código de barras via câmera
 
 ## Limitações conhecidas
-
-A versão atual representa a primeira integração funcional do aplicativo com um backend, mas ainda existem pontos que precisam ser aprimorados.
-
-- **Autenticação:** a tela de login é demonstrativa. Não existe autenticação real no backend nem isolamento dos dados por usuário.
-- **Conectividade:** o aplicativo depende da conexão com a API e não oferece funcionamento offline ou sincronização posterior.
-- **Segurança de transporte:** o ambiente de desenvolvimento utiliza HTTP sem criptografia. Uma implantação pública deve utilizar HTTPS e outras medidas de segurança apropriadas.
-- **Modelagem da API:** a implementação atual expõe entidades diretamente, sem uma camada de DTOs dedicada.
-- **Atualização de produtos:** a operação utiliza `POST` em vez de `PUT` ou `PATCH`.
-- **Paginação:** as listagens não possuem paginação implementada.
-- **Código de barras:** a leitura automática pela câmera ainda não está disponível.
-- **Testes automatizados:** ainda não há cobertura automatizada implementada.
-- **Persistência local:** não há cache local para consulta dos dados sem conexão com o servidor.
-
-## Histórico de desenvolvimento
-
-### Etapa 01 — Planejamento
-
-Definição da proposta da aplicação, do problema a ser resolvido e das funcionalidades previstas.
-
-### Etapa 02 — Protótipo de interface
-
-Implementação inicial das telas de login, dashboard, cadastro e consulta de produtos, utilizando dados demonstrativos.
-
-### Etapa 03 — Navegação, UX e acessibilidade
-
-Refinamento da navegação, criação de componentes reutilizáveis, feedback visual e implementação de medidas iniciais de acessibilidade.
-
-### Etapa 05 — Primeira versão funcional com backend
-
-Integração do frontend mobile com a API REST em Spring Boot e persistência em PostgreSQL. Implementação do fluxo de negócio de cadastro, consulta, atualização de estoque e exclusão de produtos.
+- Etapa 01: apenas planejamento e documentação da proposta, sem código
+  funcional ainda.
+- Etapa 02: implementada a camada visual e de navegação (Login, Dashboard,
+  Cadastro de Produto e Consulta de Produtos), com dados mockados.
+- Etapa 03: navegação refinada, com feedback visual e acessibilidade nos
+  principais componentes. O Menu foi removido por falta de funcionalidades.
+- Etapa 05 (atual):
+  - O Login continua sendo apenas de demonstração: não há autenticação nem controle de usuários.
+  - O app precisa de conexão com o servidor; não há uso offline nem cache local.
+  - Em desenvolvimento a comunicação usa HTTP sem criptografia; em produção deve ser HTTPS.
+  - A API expõe as entidades diretamente, sem DTOs, e a atualização de produto usa `POST` em vez de `PUT`/`PATCH`.
+  - Sem paginação nas listagens.
+  - A leitura de código de barras pela câmera ainda não foi implementada.
+  - Sem testes automatizados.
+- Etapa 06:
+  - Os serviços usados são bases colaborativas: a cobertura de produtos (principalmente não alimentícios e marcas locais) é incompleta, e os dados devem ser conferidos pelo usuário.
+  - A consulta preenche apenas o nome (e marca); categoria, quantidade, preço e localização continuam manuais.
+  - A consulta depende de internet e de o serviço público estar no ar; se falhar, o cadastro manual continua disponível.
+  - A leitura do código pela câmera ainda não foi implementada (o código é digitado).
 
 ## Documentação
-
 - [Proposta da aplicação](docs/proposta.md)
 - [Etapa 02 — Implementação do protótipo de interface](docs/etapa-02.md)
-- [Etapa 03 — Navegação, UX e acessibilidade](docs/etapa-03.md)
+- [Etapa 03 — Navegação, UX e Acessibilidade](docs/etapa-03.md)
 - [Etapa 05 — Primeira versão funcional com backend](docs/etapa-05.md)
-
-## Próximos passos
-
-- Implementar autenticação e autorização no backend.
-- Associar os dados de estoque ao usuário autenticado.
-- Implementar leitura de código de barras pela câmera.
-- Introduzir DTOs e aprimorar os contratos da API.
-- Adicionar paginação e tratamento padronizado de erros.
-- Implementar testes automatizados no frontend e no backend.
-- Avaliar cache local e suporte a operações offline.
-- Preparar a aplicação para implantação com HTTPS.
-
-## Repositório
-
-Código-fonte: [GitHub — Estoque Fácil](https://github.com/kaeliton09/EstoqueFacil)
+- [Etapa 06 — Integração com serviço externo](docs/etapa-06.md)
