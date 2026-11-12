@@ -53,7 +53,7 @@ public class ProductController {
 
     @GetMapping("/name/{name}")
     public List<ProductModel> findByName(@PathVariable String name) {
-        return productService.findByName(name);
+        return productService.findByName(name);  
     }
 
     @GetMapping("/barcode/{barcode}")

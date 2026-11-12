@@ -31,7 +31,7 @@ public class ProductModel {
     private Long id;
 
     @PositiveOrZero(message = "Código do produto não pode ser negativo")
-    private int code;
+    private String code;
     
     @NotNull(message = "Nome do produto não pode ser nulo")
     private String name;

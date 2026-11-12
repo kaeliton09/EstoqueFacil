@@ -2,9 +2,11 @@ package dev.Kaeliton.EstoqueFacil.Products;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-@Service 
+@Service
 public class ProductService {
 
     private ProductRepository productRepository;
@@ -47,16 +49,16 @@ public class ProductService {
         .toList();
     }
 
-    // buscar produtos por codigo de barras
+    // buscar produtos por codigo de barras (o codigo agora e texto: preserva zeros a esquerda)
     public List<ProductModel> findByBarcode(int barcode) {
-        return productRepository.findAll()
-        .stream()
-        .filter(product -> product.getCode() == barcode)
-        .toList();
+        return productRepository.findByCode(barcode);
     }
 
     // criar produto
     public ProductModel save(ProductModel product) {
+        if (productRepository.existsByCode(product.getCode())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um produto com esse código");
+        }
         return productRepository.save(product);
     }
 
@@ -70,5 +72,5 @@ public class ProductService {
     public void delete(Long id) {
         productRepository.deleteById(id);
     }
-    
+
 }
